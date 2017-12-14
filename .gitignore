@@ -3,3 +3,7 @@
 ################################################################################
 
 /TokenAuthWebApiCore.Server/bin/Debug/netcoreapp1.1
+/.vs/TokenAuthWebApiCore/v15/Server/sqlite3
+/TokenAuthWebApiCore.Server.IntegrationTest/bin/Debug/netcoreapp1.1
+/TokenAuthWebApiCore.Server.IntegrationTest/obj
+/TokenAuthWebApiCore.Server/obj
