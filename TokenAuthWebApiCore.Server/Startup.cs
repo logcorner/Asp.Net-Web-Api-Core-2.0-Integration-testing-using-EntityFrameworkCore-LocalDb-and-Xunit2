@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,38 +39,21 @@ namespace TokenAuthWebApiCore.Server
 
             services.AddAuthentication((cfg =>
             {
-                cfg.DefaultScheme = IdentityConstants.ApplicationScheme;
+                cfg.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 cfg.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })).AddJwtBearer(options =>
             {
+                options.RequireHttpsMetadata = false;
+
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
                     ValidIssuer = Configuration["JwtSecurityToken:Issuer"],
                     ValidAudience = Configuration["JwtSecurityToken:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JwtSecurityToken:Key"]))
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JwtSecurityToken:Key"])),
+                    ValidateLifetime = true
                 };
             });
-
-            //services.AddIdentity<MyUser, MyRole>(cfg =>
-            //{
-            //	// if we are accessing the /api and an unauthorized request is made
-            //	// do not redirect to the login page, but simply return "Unauthorized"
-            //	cfg.Cookies.ApplicationCookie.Events = new CookieAuthenticationEvents
-            //	{
-            //		OnRedirectToLogin = ctx =>
-            //		{
-            //			if (ctx.Request.Path.StartsWithSegments("/api"))
-            //				ctx.Response.StatusCode = (int)System.Net.HttpStatusCode.Unauthorized;
-
-            //			return Task.FromResult(0);
-            //		}
-            //	};
-            //}).AddEntityFrameworkStores<SecurityContext>()
-            //.AddDefaultTokenProviders();
         }
 
         public virtual void SetUpDataBase(IServiceCollection services)
@@ -86,34 +68,17 @@ namespace TokenAuthWebApiCore.Server
             dbContext.Database.Migrate();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-            loggerFactory.AddDebug();
+            loggerFactory.AddDebug(LogLevel.Error);
+
             app.UseAuthentication();
-            //app.UseIdentity();
 
-            //app.UseJwtBearerAuthentication(new JwtBearerOptions()
-            //{
-            //    AutomaticAuthenticate = true,
-            //    AutomaticChallenge = true,
-            //    TokenValidationParameters = new TokenValidationParameters()
-            //    {
-            //        ValidIssuer = Configuration["JwtSecurityToken:Issuer"],
-            //        ValidAudience = Configuration["JwtSecurityToken:Audience"],
-            //        ValidateIssuerSigningKey = true,
-            //        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JwtSecurityToken:Key"])),
-            //        ValidateLifetime = true
-            //    }
-            //});
-
-            //app.UseMvc();
             app.UseMvc(routes =>
             {
             });
 
-            // within your Configure method:
             using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>()
               .CreateScope())
             {
