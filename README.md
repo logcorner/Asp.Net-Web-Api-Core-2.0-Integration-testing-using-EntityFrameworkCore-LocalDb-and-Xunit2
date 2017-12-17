@@ -1,7 +1,7 @@
 # Asp.Net-Web-Api-Core-2.0-Integration-testing-using-EntityFrameworkCore-LocalDb-and-Xunit2
 # To migrate JW from asp.net core 1.x to asp.net core 2.0 proceed as follows
 # 1. Go to project properties and choose .NET Core 2.0 as TargetFramework
-# 2. open ConfigureServices of startup.cs file and remove this line of code :
+# 2. open ConfigureServices of startup.cs file and paste this line of code :
   
             services.AddIdentity<MyUser, MyRole>().AddEntityFrameworkStores<SecurityContext>();
             services.AddAuthentication((cfg =>
